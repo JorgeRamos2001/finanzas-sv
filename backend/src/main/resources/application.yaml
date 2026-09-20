@@ -1,3 +1,37 @@
 spring:
   application:
-    name: backend
+    name: finanzas-sv-backend
+
+  # ---------------------------------------------------------------------------
+  # Base de datos PostgreSQL
+  # ---------------------------------------------------------------------------
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:finanzas_sv}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+
+  # ---------------------------------------------------------------------------
+  # JPA / Hibernate: el esquema lo controla Flyway, Hibernate solo valida
+  # ---------------------------------------------------------------------------
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+
+  # ---------------------------------------------------------------------------
+  # Flyway: ejecuta db/migration/V1__schema.sql y V2__data.sql al arrancar
+  # ---------------------------------------------------------------------------
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+server:
+  port: ${SERVER_PORT:8080}
+
+logging:
+  level:
+    com.finanzassv: INFO
