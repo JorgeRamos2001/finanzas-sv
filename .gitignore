@@ -1,0 +1,27 @@
+# Archivos de entorno y credenciales (¡CRÍTICO!)
+.env
+.env.*
+*.local
+
+# Configuraciones de IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Archivos del sistema operativo
+.DS_Store
+Thumbs.db
+
+# Build backend (Java/Maven)
+backend/target/
+backend/*.log
+
+# Build frontend (Node/Vue)
+frontend/node_modules/
+frontend/dist/
+frontend/*.log
+
+# Logs y temporales
+logs/
+*.log
