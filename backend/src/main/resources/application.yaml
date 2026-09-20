@@ -3,6 +3,14 @@ spring:
     name: finanzas-sv-backend
 
   # ---------------------------------------------------------------------------
+  # Variables de entorno locales (.env en la raiz de /backend)
+  # El hint [.properties] hace que Spring Boot lea el .env como archivo
+  # de propiedades. "optional:" evita error si el archivo no existe.
+  # ---------------------------------------------------------------------------
+  config:
+    import: optional:file:.env[.properties]
+
+  # ---------------------------------------------------------------------------
   # Base de datos PostgreSQL
   # ---------------------------------------------------------------------------
   datasource:
