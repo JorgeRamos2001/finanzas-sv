@@ -47,48 +47,48 @@ INSERT INTO cuentas (id, codigo, nombre, nivel, cuenta_padre_id, naturaleza, ace
 -- -----------------------------------------------------------------------------
 INSERT INTO cuentas (id, codigo, nombre, nivel, cuenta_padre_id, naturaleza, acepta_movimientos) VALUES
     -- Activo
-    (6,  '1.1', 'Efectivo y Equivalentes',      2, 1, 'DEUDOR',   FALSE),
-    (7,  '1.2', 'Cuentas por Cobrar',           2, 1, 'DEUDOR',   FALSE),
-    (8,  '1.3', 'Inventarios',                  2, 1, 'DEUDOR',   FALSE),
-    (9,  '1.4', 'Propiedad, Planta y Equipo',   2, 1, 'DEUDOR',   FALSE),
+    (6,  '11', 'Efectivo y Equivalentes',      2, 1, 'DEUDOR',   FALSE),
+    (7,  '12', 'Cuentas por Cobrar',           2, 1, 'DEUDOR',   FALSE),
+    (8,  '13', 'Inventarios',                  2, 1, 'DEUDOR',   FALSE),
+    (9,  '14', 'Propiedad, Planta y Equipo',   2, 1, 'DEUDOR',   FALSE),
     -- Pasivo
-    (10, '2.1', 'Cuentas por Pagar',            2, 2, 'ACREEDOR', FALSE),
-    (11, '2.2', 'Prestamos por Pagar',          2, 2, 'ACREEDOR', FALSE),
+    (10, '21', 'Cuentas por Pagar',            2, 2, 'ACREEDOR', FALSE),
+    (11, '22', 'Prestamos por Pagar',          2, 2, 'ACREEDOR', FALSE),
     -- Capital Contable
-    (12, '3.1', 'Capital Social',               2, 3, 'ACREEDOR', FALSE),
-    (13, '3.2', 'Utilidades Retenidas',         2, 3, 'ACREEDOR', FALSE),
+    (12, '31', 'Capital Social',               2, 3, 'ACREEDOR', FALSE),
+    (13, '32', 'Utilidades Retenidas',         2, 3, 'ACREEDOR', FALSE),
     -- Costos y Gastos
-    (14, '4.1', 'Costo de Ventas',              2, 4, 'DEUDOR',   FALSE),
-    (15, '4.2', 'Gastos Operativos',            2, 4, 'DEUDOR',   FALSE),
+    (14, '41', 'Costo de Ventas',              2, 4, 'DEUDOR',   FALSE),
+    (15, '42', 'Gastos Operativos',            2, 4, 'DEUDOR',   FALSE),
     -- Ingresos
-    (16, '5.1', 'Ventas',                       2, 5, 'ACREEDOR', FALSE),
-    (17, '5.2', 'Otros Ingresos',               2, 5, 'ACREEDOR', FALSE);
+    (16, '51', 'Ventas',                       2, 5, 'ACREEDOR', FALSE),
+    (17, '52', 'Otros Ingresos',               2, 5, 'ACREEDOR', FALSE);
 
 -- -----------------------------------------------------------------------------
 -- 4. CATALOGO DE CUENTAS - NIVEL 3 (cuentas secundarias de movimiento)
 -- -----------------------------------------------------------------------------
 INSERT INTO cuentas (id, codigo, nombre, nivel, cuenta_padre_id, naturaleza, acepta_movimientos) VALUES
     -- Activo
-    (18, '1.1.1', 'Caja',                   3, 6,  'DEUDOR',   TRUE),
-    (19, '1.1.2', 'Bancos',                 3, 6,  'DEUDOR',   TRUE),
-    (20, '1.2.1', 'Clientes',               3, 7,  'DEUDOR',   TRUE),
-    (21, '1.3.1', 'Mercaderias',            3, 8,  'DEUDOR',   TRUE),
-    (22, '1.4.1', 'Mobiliario y Equipo',    3, 9,  'DEUDOR',   TRUE),
-    (23, '1.4.2', 'Equipo de Computo',      3, 9,  'DEUDOR',   TRUE),
+    (18, '111', 'Caja',                   3, 6,  'DEUDOR',   TRUE),
+    (19, '112', 'Bancos',                 3, 6,  'DEUDOR',   TRUE),
+    (20, '121', 'Clientes',               3, 7,  'DEUDOR',   TRUE),
+    (21, '131', 'Mercaderias',            3, 8,  'DEUDOR',   TRUE),
+    (22, '141', 'Mobiliario y Equipo',    3, 9,  'DEUDOR',   TRUE),
+    (23, '142', 'Equipo de Computo',      3, 9,  'DEUDOR',   TRUE),
     -- Pasivo
-    (24, '2.1.1', 'Proveedores',            3, 10, 'ACREEDOR', TRUE),
-    (25, '2.2.1', 'Prestamos Bancarios',    3, 11, 'ACREEDOR', TRUE),
+    (24, '211', 'Proveedores',            3, 10, 'ACREEDOR', TRUE),
+    (25, '221', 'Prestamos Bancarios',    3, 11, 'ACREEDOR', TRUE),
     -- Capital Contable
-    (26, '3.1.1', 'Capital Ordinario',      3, 12, 'ACREEDOR', TRUE),
-    (27, '3.2.1', 'Utilidades del Ejercicio', 3, 13, 'ACREEDOR', TRUE),
+    (26, '311', 'Capital Ordinario',      3, 12, 'ACREEDOR', TRUE),
+    (27, '321', 'Utilidades del Ejercicio', 3, 13, 'ACREEDOR', TRUE),
     -- Costos y Gastos
-    (28, '4.1.1', 'Costo de Mercaderias',   3, 14, 'DEUDOR',   TRUE),
-    (29, '4.2.1', 'Sueldos y Salarios',     3, 15, 'DEUDOR',   TRUE),
-    (30, '4.2.2', 'Renta / Alquileres',     3, 15, 'DEUDOR',   TRUE),
-    (31, '4.2.3', 'Energia Electrica',      3, 15, 'DEUDOR',   TRUE),
-    (32, '4.2.4', 'Papeleria y Utiles',     3, 15, 'DEUDOR',   TRUE),
+    (28, '411', 'Costo de Mercaderias',   3, 14, 'DEUDOR',   TRUE),
+    (29, '421', 'Sueldos y Salarios',     3, 15, 'DEUDOR',   TRUE),
+    (30, '422', 'Renta / Alquileres',     3, 15, 'DEUDOR',   TRUE),
+    (31, '423', 'Energia Electrica',      3, 15, 'DEUDOR',   TRUE),
+    (32, '424', 'Papeleria y Utiles',     3, 15, 'DEUDOR',   TRUE),
     -- Ingresos
-    (33, '5.1.1', 'Ventas Locales',         3, 16, 'ACREEDOR', TRUE),
-    (34, '5.2.1', 'Ingresos por Intereses', 3, 17, 'ACREEDOR', TRUE);
+    (33, '511', 'Ventas Locales',         3, 16, 'ACREEDOR', TRUE),
+    (34, '521', 'Ingresos por Intereses', 3, 17, 'ACREEDOR', TRUE);
 
 SELECT setval('cuentas_id_seq', 34, TRUE);
