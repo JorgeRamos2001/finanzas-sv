@@ -3,8 +3,10 @@ package com.finanzassv.service;
 import com.finanzassv.dto.asiento.AsientoRequest;
 import com.finanzassv.dto.asiento.LineaAsientoRequest;
 import com.finanzassv.entity.Asiento;
+import com.finanzassv.entity.AsientoDetalle;
 import com.finanzassv.entity.Cuenta;
 import com.finanzassv.entity.Usuario;
+import com.finanzassv.enums.EstadoAsiento;
 import com.finanzassv.enums.NaturalezaCuenta;
 import com.finanzassv.exception.ReglaNegocioException;
 import com.finanzassv.repository.AsientoRepository;
@@ -182,6 +184,57 @@ class AsientoServiceTest {
         assertThatThrownBy(() -> service.registrar(request, autenticado()))
                 .isInstanceOf(ReglaNegocioException.class)
                 .hasMessageContaining("PRINCIPAL");
+    }
+
+    @Test
+    @DisplayName("Mayor de cuenta PRINCIPAL consolida por asiento las subcuentas")
+    void mayorDeCuentaPrincipalConsolida() {
+        // 1101 Efectivo con hijos: 110101 Caja y una caja chica de prueba
+        var cajaChica = cuenta(110L, "11010102", "Caja Chica", 5, efectivo);
+        efectivo.setSubCuentas(new java.util.ArrayList<>(java.util.List.of(caja, cajaChica)));
+
+        var asiento = Asiento.builder()
+                .numeroAsiento(1L).fecha(LocalDate.of(2026, 9, 2))
+                .concepto("Venta al contado").estado(EstadoAsiento.REGISTRADO)
+                .build();
+        var detalle1 = AsientoDetalle.builder()
+                .asiento(asiento).cuenta(caja).concepto("Ingreso a Caja")
+                .montoDebe(new BigDecimal("500")).montoHaber(BigDecimal.ZERO)
+                .ordenLinea(1).build();
+        var detalle2 = AsientoDetalle.builder()
+                .asiento(asiento).cuenta(cajaChica).concepto("Arqueo de caja")
+                .montoDebe(new BigDecimal("300")).montoHaber(BigDecimal.ZERO)
+                .ordenLinea(2).build();
+        when(detalleRepository.findByCuentaIdIn(any()))
+                .thenReturn(List.of(detalle1, detalle2));
+
+        var mayor = service.mayorPorCuenta(efectivo.getId());
+
+        // El asiento aparece como UNA linea consolidada: 500 + 300 = 800
+        assertThat(mayor).hasSize(1);
+        assertThat(mayor.get(0).numeroAsiento()).isEqualTo(1L);
+        assertThat(mayor.get(0).montoDebe()).isEqualByComparingTo("800");
+        assertThat(mayor.get(0).conceptoLinea()).contains("Consolidado de 2");
+    }
+
+    @Test
+    @DisplayName("Mayor de cuenta de MOVIMIENTO muestra la partida en parcial")
+    void mayorDeCuentaMovimientoMuestraParcial() {
+        var asiento = Asiento.builder()
+                .numeroAsiento(1L).fecha(LocalDate.of(2026, 9, 2))
+                .concepto("Venta al contado").estado(EstadoAsiento.REGISTRADO)
+                .build();
+        var detalle = AsientoDetalle.builder()
+                .asiento(asiento).cuenta(caja).concepto("Ingreso a Caja")
+                .montoDebe(new BigDecimal("500")).montoHaber(BigDecimal.ZERO)
+                .ordenLinea(1).build();
+        when(detalleRepository.findByCuentaIdIn(any())).thenReturn(List.of(detalle));
+
+        var mayor = service.mayorPorCuenta(caja.getId());
+
+        assertThat(mayor).hasSize(1);
+        assertThat(mayor.get(0).conceptoLinea()).isEqualTo("Ingreso a Caja");
+        assertThat(mayor.get(0).montoDebe()).isEqualByComparingTo("500");
     }
 
     @Test
