@@ -5,6 +5,7 @@ import com.finanzassv.dto.asiento.AsientoResumenResponse;
 import com.finanzassv.dto.asiento.AsientoResponse;
 import com.finanzassv.dto.asiento.LineaAsientoRequest;
 import com.finanzassv.dto.asiento.LineaAsientoResponse;
+import com.finanzassv.dto.asiento.LineaMayorResponse;
 import com.finanzassv.entity.Asiento;
 import com.finanzassv.entity.AsientoDetalle;
 import com.finanzassv.entity.Cuenta;
@@ -12,6 +13,7 @@ import com.finanzassv.entity.Usuario;
 import com.finanzassv.enums.EstadoAsiento;
 import com.finanzassv.exception.RecursoNoEncontradoException;
 import com.finanzassv.exception.ReglaNegocioException;
+import com.finanzassv.repository.AsientoDetalleRepository;
 import com.finanzassv.repository.AsientoRepository;
 import com.finanzassv.repository.CuentaRepository;
 import com.finanzassv.repository.UsuarioRepository;
@@ -44,12 +46,14 @@ import java.util.stream.Collectors;
 public class AsientoService {
 
     private final AsientoRepository asientoRepository;
+    private final AsientoDetalleRepository detalleRepository;
     private final CuentaRepository cuentaRepository;
     private final UsuarioRepository usuarioRepository;
 
-    public AsientoService(AsientoRepository asientoRepository, CuentaRepository cuentaRepository,
-                          UsuarioRepository usuarioRepository) {
+    public AsientoService(AsientoRepository asientoRepository, AsientoDetalleRepository detalleRepository,
+                          CuentaRepository cuentaRepository, UsuarioRepository usuarioRepository) {
         this.asientoRepository = asientoRepository;
+        this.detalleRepository = detalleRepository;
         this.cuentaRepository = cuentaRepository;
         this.usuarioRepository = usuarioRepository;
     }
@@ -159,6 +163,27 @@ public class AsientoService {
         var asiento = asientoRepository.findById(id)
                 .orElseThrow(() -> new RecursoNoEncontradoException("Asiento no encontrado: " + id));
         return aRespuesta(asiento);
+    }
+
+    /**
+     * Libro Mayor de una cuenta: movimientos (Debe/Haber) de los asientos
+     * registrados que la afectan, ordenados por fecha y numero de asiento.
+     */
+    @Transactional(readOnly = true)
+    public List<LineaMayorResponse> mayorPorCuenta(Long cuentaId) {
+        if (!cuentaRepository.existsById(cuentaId)) {
+            throw new RecursoNoEncontradoException("Cuenta no encontrada: " + cuentaId);
+        }
+        return detalleRepository.findByCuentaId(cuentaId).stream()
+                .filter(d -> d.getAsiento().getEstado() == EstadoAsiento.REGISTRADO)
+                .sorted(java.util.Comparator
+                        .comparing((AsientoDetalle d) -> d.getAsiento().getFecha())
+                        .thenComparing(d -> d.getAsiento().getNumeroAsiento()))
+                .map(d -> new LineaMayorResponse(
+                        d.getAsiento().getNumeroAsiento(), d.getAsiento().getFecha(),
+                        d.getAsiento().getConcepto(), d.getConcepto(),
+                        d.getMontoDebe(), d.getMontoHaber()))
+                .toList();
     }
 
     // ------------------------------------------------------------------

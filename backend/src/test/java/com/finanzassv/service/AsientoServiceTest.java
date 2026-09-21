@@ -34,6 +34,7 @@ import static org.mockito.Mockito.when;
 class AsientoServiceTest {
 
     private AsientoRepository asientoRepository;
+    private com.finanzassv.repository.AsientoDetalleRepository detalleRepository;
     private CuentaRepository cuentaRepository;
     private UsuarioRepository usuarioRepository;
     private AsientoService service;
@@ -49,9 +50,11 @@ class AsientoServiceTest {
     @BeforeEach
     void setUp() {
         asientoRepository = mock(AsientoRepository.class);
+        detalleRepository = mock(com.finanzassv.repository.AsientoDetalleRepository.class);
         cuentaRepository = mock(CuentaRepository.class);
         usuarioRepository = mock(UsuarioRepository.class);
-        service = new AsientoService(asientoRepository, cuentaRepository, usuarioRepository);
+        service = new AsientoService(asientoRepository, detalleRepository, cuentaRepository,
+                usuarioRepository);
 
         activo = cuenta(1L, "1", "Activo", 1, null);
         efectivo = cuenta(6L, "1.1", "Efectivo y Equivalentes", 2, activo);
