@@ -30,7 +30,7 @@ const raices = computed(() => {
 })
 
 const padresPosibles = computed(() =>
-  cuentas.value.filter((c) => !c.aceptaMovimientos && c.nivel < 4 && c.activo),
+  cuentas.value.filter((c) => !c.aceptaMovimientos && c.nivel < 6 && c.activo),
 )
 
 async function cargar() {

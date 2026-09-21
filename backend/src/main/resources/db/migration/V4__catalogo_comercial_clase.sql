@@ -1,36 +1,32 @@
 -- =============================================================================
---  FinanzasSV - Modulo de Contabilidad Automatizado
---  Script DML: datos iniciales (PostgreSQL)
+--  FinanzasSV - V4: Catalogo comercial de la clase (Universidad Catolica de El Salvador)
 --  Rama: feat/catalogo-comercial-clase
 -- =============================================================================
---  Contenido:
---    1. Usuarios por defecto (contrasenas cifradas con BCrypt)
---    2. Catalogo comercial de clase ADAPTADO (~150 cuentas, codigos del
---       manual de cuentas comercial de la clase) con niveles 1-6.
---       Ejecutar DESPUES de schema.sql en una base de datos limpia.
+--  Reemplaza el catalogo basico por el catalogo comercial de clase ADAPTADO:
+--    * Codigos EXACTOS del manual de cuentas (sin puntos, como la clase)
+--    * Nivel segun longitud del codigo (1 digito=1, 2=2, 4=3, 6=4, 8=5, 10=6)
+--    * Cuentas de ultimo nivel (hoja) aceptan movimientos
+--    * Cuentas (CR) (contrarias): naturaleza ACREEDOR
+--    * EXCLUIDO: rubro 7 CUENTAS DE ORDEN (no participa en la partida doble
+--      ni en los estados financieros del sistema)
+--    * REINICIA los asientos de prueba: TRUNCATE con reinicio de secuencias
 --
---  Clasificacion por PRIMER DIGITO del codigo:
---    1 = Activo | 2 = Pasivo | 3 = Patrimonio
---    4 = Cuentas de Resultado Deudoras (Costos y Gastos)
---    5 = Cuentas de Resultado Acreedoras (Ingresos)
---    6 = Cuenta de Cierre
---  (Rubro 7 CUENTAS DE ORDEN excluido: no participa en la partida doble)
+--  Clasificacion por PRIMER DIGITO (identica a la de la clase):
+--    1 = ACTIVO                          (Activo = Pasivo + Capital)
+--    2 = PASIVO
+--    3 = PATRIMONIO
+--    4 = CUENTAS DE RESULTADO DEUDORAS  (Costos y Gastos)
+--    5 = CUENTAS DE RESULTADO ACREEDORAS (Ingresos)
+--    6 = CUENTA DE CIERRE
 -- =============================================================================
 
--- -----------------------------------------------------------------------------
--- 1. USUARIOS POR DEFECTO
---    admin    / admin123     -> ADMIN
---    contador / contador123  -> CONTADOR
---    consulta / consulta123  -> CONSULTA
--- -----------------------------------------------------------------------------
-INSERT INTO usuarios (id, username, password, nombre_completo, rol, activo) VALUES
-    (1, 'admin',    '$2b$10$2tgCM3U9/Dl204doKT76Fu/5Zy18joj2FLo85Gbkoyjbeab9AoJO6', 'Administrador del Sistema', 'ADMIN',    TRUE),
-    (2, 'contador', '$2b$10$.qmj4AE41k0u9a9qgf0YSu44n5tG7KYBqzgK20epEByn8W7l4R4Ry', 'Contador General',          'CONTADOR', TRUE),
-    (3, 'consulta', '$2b$10$RHton803cKpl6rKXU.FVdOms7hHFM1rCfCvz9haKV2FVOEGeMrCda', 'Auditor / Consulta',        'CONSULTA', TRUE);
-SELECT setval('usuarios_id_seq', 3, TRUE);
+-- 1. Ampliar niveles de 1-4 a 1-6 (estructura de 1, 2, 4, 6, 8 y 10 digitos)
+ALTER TABLE cuentas DROP CONSTRAINT chk_cuentas_nivel;
+ALTER TABLE cuentas
+    ADD CONSTRAINT chk_cuentas_nivel CHECK (nivel BETWEEN 1 AND 6);
 
--- -----------------------------------------------------------------------------
--- -- -----------------------------------------------------------------------------
+-- 2. Reiniciar catalogo y asientos de prueba (los codigos cambian por completo)
+TRUNCATE TABLE asiento_detalles, asientos, cuentas RESTART IDENTITY CASCADE;
 
 -- =============================================================================
 -- NIVEL 1 - RUBROS DE AGRUPACION (1 digito)
@@ -375,9 +371,3 @@ INSERT INTO cuentas (codigo, nombre, nivel, cuenta_padre_id, naturaleza, acepta_
 SELECT '1101020105', 'Banco Agrícola, S.A.', 6, id, 'DEUDOR', TRUE FROM cuentas WHERE codigo = '11010201';
 INSERT INTO cuentas (codigo, nombre, nivel, cuenta_padre_id, naturaleza, acepta_movimientos)
 SELECT '1101020106', 'Banco Promerica', 6, id, 'DEUDOR', TRUE FROM cuentas WHERE codigo = '11010201';
-
-INSERT INTO cuentas (codigo, nombre, nivel, cuenta_padre_id, naturaleza, acepta_movimientos)
-SELECT '31010101', 'Capital Social Mínimo pagado', 5, id, 'ACREEDOR', TRUE FROM cuentas WHERE codigo = '310101';
-
-INSERT INTO cuentas (codigo, nombre, nivel, cuenta_padre_id, naturaleza, acepta_movimientos)
-SELECT '31010102', 'Capital Social Mínimo por pagar', 5, id, 'ACREEDOR', TRUE FROM cuentas WHERE codigo = '310101';
