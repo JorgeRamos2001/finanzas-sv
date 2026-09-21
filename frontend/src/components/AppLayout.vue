@@ -23,14 +23,14 @@ function salir() {
 </script>
 
 <template>
-  <div class="flex min-h-screen">
-    <!-- Barra lateral -->
-    <aside class="w-64 shrink-0 bg-slate-900 text-slate-100 flex flex-col">
-      <div class="px-5 py-6 border-b border-slate-700">
+  <div class="flex h-screen overflow-hidden">
+    <!-- Barra lateral: altura fija de pantalla, sin scroll de pagina -->
+    <aside class="w-64 shrink-0 h-full bg-slate-900 text-slate-100 flex flex-col">
+      <div class="px-5 py-6 border-b border-slate-700 shrink-0">
         <p class="text-lg font-bold tracking-tight">Finanzas<span class="text-emerald-400">SV</span></p>
         <p class="text-xs text-slate-400 mt-1">Módulo de Contabilidad</p>
       </div>
-      <nav class="flex-1 px-3 py-4 space-y-1">
+      <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-1">
         <router-link
           v-for="enlace in visibles"
           :key="enlace.ruta"
@@ -42,7 +42,7 @@ function salir() {
           {{ enlace.nombre }}
         </router-link>
       </nav>
-      <div class="px-4 py-4 border-t border-slate-700">
+      <div class="px-4 py-4 border-t border-slate-700 shrink-0">
         <div class="flex items-center gap-3">
           <div class="w-9 h-9 rounded-full bg-emerald-600 flex items-center justify-center font-bold">
             {{ auth.inicial }}
@@ -61,8 +61,8 @@ function salir() {
       </div>
     </aside>
 
-    <!-- Contenido -->
-    <main class="flex-1 overflow-y-auto">
+    <!-- Contenido: scroll independiente del menu -->
+    <main class="flex-1 h-full overflow-y-auto">
       <router-view />
     </main>
   </div>
