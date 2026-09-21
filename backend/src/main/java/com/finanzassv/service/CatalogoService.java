@@ -62,6 +62,10 @@ public class CatalogoService {
                         "No se puede crear una subcuenta bajo una cuenta de movimiento");
             }
             nivel = padre.getNivel() + 1;
+            if (nivel > 6) {
+                throw new ReglaNegocioException(
+                        "El catalogo admite hasta 6 niveles (cuentas de 10 digitos)");
+            }
         }
 
         if (request.naturaleza() == null) {

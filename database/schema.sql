@@ -37,10 +37,15 @@ COMMENT ON TABLE usuarios IS 'Usuarios del sistema con roles de acceso';
 -- -----------------------------------------------------------------------------
 -- TABLA: cuentas (Catalogo contable jerarquico)
 -- -----------------------------------------------------------------------------
---  Nivel 1-2      : cuentas principales (control), NO aceptan movimientos.
---  Nivel 3 (hoja) : cuentas secundarias (movimiento), aceptan movimientos.
---  Los saldos de las cuentas principales se consolidan automaticamente
---  (mayorizacion) a partir de los movimientos de sus cuentas secundarias.
+--  Catalogo comercial de clase: nivel segun longitud del codigo
+--    Nivel 1 (1 digito)  : rubros de agrupacion   (ej. 1 ACTIVO)
+--    Nivel 2 (2 digitos) : rubros                 (ej. 11 ACTIVO CORRIENTE)
+--    Nivel 3 (4 digitos) : cuentas de mayor       (ej. 1101 EFECTIVO)
+--    Nivel 4 (6 digitos) : subcuentas             (ej. 110101 CAJA)
+--    Nivel 5 (8 digitos) : cuentas de detalle     (ej. 11010101 Caja General)
+--    Nivel 6 (10 digitos): subcuentas analiticas  (ej. 1101020101 BAC, S.A.)
+--  Solo las cuentas HOJA (sin subcuentas) aceptan movimientos. Los saldos de
+--  las cuentas superiores se consolidan automaticamente (mayorizacion).
 -- -----------------------------------------------------------------------------
 CREATE TABLE cuentas (
     id                 BIGSERIAL PRIMARY KEY,
@@ -61,7 +66,7 @@ CREATE TABLE cuentas (
         REFERENCES cuentas (id)
         ON UPDATE CASCADE
         ON DELETE RESTRICT,
-    CONSTRAINT chk_cuentas_nivel CHECK (nivel BETWEEN 1 AND 4),
+    CONSTRAINT chk_cuentas_nivel CHECK (nivel BETWEEN 1 AND 6),
     CONSTRAINT chk_cuentas_naturaleza CHECK (naturaleza IN ('DEUDOR', 'ACREEDOR')),
     CONSTRAINT chk_cuentas_saldos CHECK (saldo_debe >= 0 AND saldo_haber >= 0),
     CONSTRAINT uk_cuentas_nombre_por_padre UNIQUE (cuenta_padre_id, nombre)
