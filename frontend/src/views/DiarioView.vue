@@ -179,11 +179,11 @@ onMounted(cargar)
             class="col-span-3 rounded-lg border border-slate-300 px-2 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500" />
           <input v-model="linea.debe" type="number" step="0.01" min="0" placeholder="0.00"
             class="col-span-2 rounded-lg border border-slate-300 px-2 py-2 text-sm text-right focus:outline-none focus:ring-2 focus:ring-blue-500" />
-          <div class="col-span-2 flex items-center gap-1">
+          <div class="col-span-2 flex items-center gap-1 min-w-0">
             <input v-model="linea.haber" type="number" step="0.01" min="0" placeholder="0.00"
-              class="flex-1 rounded-lg border border-slate-300 px-2 py-2 text-sm text-right focus:outline-none focus:ring-2 focus:ring-amber-500" />
+              class="w-full min-w-0 rounded-lg border border-slate-300 px-2 py-2 text-sm text-right focus:outline-none focus:ring-2 focus:ring-amber-500" />
             <button v-if="lineas.length > 1" @click="quitarLinea(i)"
-              class="text-slate-300 hover:text-red-600 px-1" title="Quitar línea">✕</button>
+              class="shrink-0 text-slate-300 hover:text-red-600 px-0.5" title="Quitar línea">✕</button>
           </div>
         </div>
       </div>

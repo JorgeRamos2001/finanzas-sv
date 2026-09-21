@@ -5,7 +5,12 @@ export const fmt = (valor) =>
     minimumFractionDigits: 2,
   }).format(Number(valor ?? 0))
 
-export const hoy = () => new Date().toISOString().slice(0, 10)
+/** Fecha de HOY en zona horaria local (no UTC) para inputs type=date. */
+export const hoy = () => {
+  const ahora = new Date()
+  const local = new Date(ahora.getTime() - ahora.getTimezoneOffset() * 60000)
+  return local.toISOString().slice(0, 10)
+}
 
 export const fechaCorta = (fecha) => {
   if (!fecha) return ''
