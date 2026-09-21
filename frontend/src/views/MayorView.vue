@@ -57,7 +57,8 @@ onMounted(cargar)
     <div>
       <h1 class="text-2xl font-bold">Libro Mayor</h1>
       <p class="text-sm text-slate-500 mt-1">
-        Movimientos Debe / Haber de una cuenta seleccionada (solo asientos registrados)
+        En cuentas PRINCIPALES se consolida el control del Debe/Haber por asiento (suma de todas sus subcuentas);
+        en cuentas de movimiento se muestra cada partida en parcial
       </p>
     </div>
 
@@ -103,6 +104,11 @@ onMounted(cargar)
 
     <!-- Movimientos -->
     <section v-if="cuentaSeleccionada" class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+      <p v-if="cuentaInfo && !cuentaInfo.aceptaMovimientos"
+        class="px-6 py-2 bg-amber-50 border-b border-amber-100 text-xs text-amber-800">
+        👁 Cuenta principal: vista CONSOLIDADA — una línea por asiento con la suma del Debe/Haber
+        de todas sus cuentas de movimiento (parciales).
+      </p>
       <table class="w-full text-sm">
         <thead>
           <tr class="text-left text-[11px] uppercase tracking-wide text-slate-400 border-b border-slate-100">

@@ -166,23 +166,55 @@ public class AsientoService {
     }
 
     /**
-     * Libro Mayor de una cuenta: movimientos (Debe/Haber) de los asientos
-     * registrados que la afectan, ordenados por fecha y numero de asiento.
+     * Libro Mayor de una cuenta.
+     *
+     * REGLA DE NEGOCIO: las cuentas PRINCIPALES (de control) registran el
+     * control del Debe y Haber: su Libro Mayor consolida, por asiento, los
+     * movimientos de TODAS sus cuentas secundarias (una linea por asiento con
+     * la suma). Las cuentas de movimiento muestran cada partida en parcial.
      */
     @Transactional(readOnly = true)
     public List<LineaMayorResponse> mayorPorCuenta(Long cuentaId) {
-        if (!cuentaRepository.existsById(cuentaId)) {
-            throw new RecursoNoEncontradoException("Cuenta no encontrada: " + cuentaId);
+        var raiz = cuentaRepository.findById(cuentaId)
+                .orElseThrow(() -> new RecursoNoEncontradoException("Cuenta no encontrada: " + cuentaId));
+
+        // Sub-arbol: la cuenta y TODAS sus descendientes
+        List<Long> idsSubarbol = new ArrayList<>();
+        java.util.Deque<Cuenta> pila = new java.util.ArrayDeque<>();
+        pila.push(raiz);
+        while (!pila.isEmpty()) {
+            Cuenta actual = pila.pop();
+            idsSubarbol.add(actual.getId());
+            if (actual.getSubCuentas() != null) {
+                actual.getSubCuentas().forEach(pila::push);
+            }
         }
-        return detalleRepository.findByCuentaId(cuentaId).stream()
+
+        Map<Asiento, List<AsientoDetalle>> porAsiento = detalleRepository
+                .findByCuentaIdIn(idsSubarbol).stream()
                 .filter(d -> d.getAsiento().getEstado() == EstadoAsiento.REGISTRADO)
+                .collect(Collectors.groupingBy(AsientoDetalle::getAsiento,
+                        java.util.LinkedHashMap::new, Collectors.toList()));
+
+        return porAsiento.values().stream()
                 .sorted(java.util.Comparator
-                        .comparing((AsientoDetalle d) -> d.getAsiento().getFecha())
-                        .thenComparing(d -> d.getAsiento().getNumeroAsiento()))
-                .map(d -> new LineaMayorResponse(
-                        d.getAsiento().getNumeroAsiento(), d.getAsiento().getFecha(),
-                        d.getAsiento().getConcepto(), d.getConcepto(),
-                        d.getMontoDebe(), d.getMontoHaber()))
+                        .comparing((List<AsientoDetalle> l) -> l.get(0).getAsiento().getFecha())
+                        .thenComparing(l -> l.get(0).getAsiento().getNumeroAsiento()))
+                .map(lineas -> {
+                    var asiento = lineas.get(0).getAsiento();
+                    BigDecimal debe = lineas.stream()
+                            .map(AsientoDetalle::getMontoDebe)
+                            .reduce(BigDecimal.ZERO, BigDecimal::add);
+                    BigDecimal haber = lineas.stream()
+                            .map(AsientoDetalle::getMontoHaber)
+                            .reduce(BigDecimal.ZERO, BigDecimal::add);
+                    String conceptoLinea = lineas.size() == 1
+                            ? lineas.get(0).getConcepto()
+                            : "Consolidado de " + lineas.size() + " cuentas de movimiento";
+                    return new LineaMayorResponse(
+                            asiento.getNumeroAsiento(), asiento.getFecha(),
+                            asiento.getConcepto(), conceptoLinea, debe, haber);
+                })
                 .toList();
     }
 
