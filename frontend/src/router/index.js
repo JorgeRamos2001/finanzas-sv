@@ -51,7 +51,7 @@ const rutas = [
 
 const router = createRouter({
   history: createWebHistory(),
-  routes,
+  routes: rutas,
 })
 
 /** Guard de navegacion: exige sesion y rol permitido. */
