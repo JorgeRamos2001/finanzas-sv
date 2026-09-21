@@ -3,6 +3,7 @@ package com.finanzassv.controller;
 import com.finanzassv.dto.asiento.AsientoRequest;
 import com.finanzassv.dto.asiento.AsientoResumenResponse;
 import com.finanzassv.dto.asiento.AsientoResponse;
+import com.finanzassv.dto.asiento.LineaMayorResponse;
 import com.finanzassv.security.UsuarioPrincipal;
 import com.finanzassv.service.AsientoService;
 import jakarta.validation.Valid;
@@ -39,6 +40,12 @@ public class AsientoController {
     @GetMapping("/{id}")
     public AsientoResponse detalle(@PathVariable Long id) {
         return asientoService.detalle(id);
+    }
+
+    /** Libro Mayor: movimientos Debe/Haber de una cuenta especifica. */
+    @GetMapping("/cuenta/{cuentaId}")
+    public List<LineaMayorResponse> mayorPorCuenta(@PathVariable Long cuentaId) {
+        return asientoService.mayorPorCuenta(cuentaId);
     }
 
     /** Rechaza con HTTP 400 si no se cumple la Ley de la Partida Doble. */
